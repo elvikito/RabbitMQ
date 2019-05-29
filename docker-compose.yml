@@ -1,0 +1,28 @@
+version: '2'
+services:
+    productor:
+        build: ./springboot-producer/
+        environment:
+            - SPRING_RABBITMQ_ADDRESSES=172.20.0.2
+            - PORT=5672
+        depends_on:
+          - rabbitmq
+        ports:
+          - "8080:8080"
+        volumes:
+          - ./springboot-producer/:/rabbitmq-producer/
+    consumidor:
+        build: ./springboot-consumer/
+        environment:
+            - SPRING_RABBITMQ_ADDRESSES=172.20.0.2
+            - PORT=5672
+        depends_on:
+          - rabbitmq
+          - productor
+        volumes:
+          - ./springboot-consumer/:/rabbitmq-consumer/
+    rabbitmq:
+        image: rabbitmq:management
+        ports:
+        - "5672:5672"
+        - "15672:15672"
